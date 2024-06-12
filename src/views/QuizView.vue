@@ -82,6 +82,7 @@ import { ref } from 'vue';
 import { getQuiz } from '@/firebase/getQuiz.js';
 import AppLayout from '@/components/AppLayout.vue';
 import QuizResults from '@/components/QuizResults.vue';
+import { waitForAuthInit, projectAuth, projectFirestore } from '@/firebase/Config';
 
 export default {
     name: 'QuizView',
@@ -109,54 +110,91 @@ export default {
             return this.currentIndex === this.quiz.questions.length - 1;
         },
         isQuizCompleted() {
-            return this.answerSubmitted && this.isLastQuestion;
+            const bool = this.answerSubmitted && this.isLastQuestion;
+            console.log(bool)
+            if (bool) {
+                saveQuizResult()
+            }
+            return bool;
         },
     },
     methods: {
-        async fetchQuiz() {
-            try {
-                const { quiz, error, load } = getQuiz(this.quizId);
-                await load();
-                this.quiz = quiz.value;
-                this.userAnswers = new Array(this.quiz.questions.length).fill(null);
-                this.loading = false;
-            } catch (error) {
-                console.error('Error fetching quiz:', error);
-                this.error = error.message;
-            }
-        },
-        submitAnswer() {
-            const userAnswer = this.userAnswers[this.currentIndex];
-            const correctAnswer = this.currentQuestion.correctAnswer;
-
-            if (userAnswer === correctAnswer) {
-                this.answerCorrect = true;
-            } else {
-                this.answerCorrect = false;
-            }
-
-            this.answerSubmitted = true;
-        },
-        nextQuestion() {
-            if (this.currentIndex < this.quiz.questions.length - 1) {
-                if (this.answerSubmitted) {
-                    this.currentIndex++;
-                    this.answerSubmitted = false;
-                }
-            } else {
-                console.log('Quiz finished', this.userAnswers);
-            }
-        },
-        retakeQuiz() {
-
-            this.currentIndex = 0;
+    async fetchQuiz() {
+        try {
+            const { quiz, error, load } = getQuiz(this.quizId);
+            await load();
+            this.quiz = quiz.value;
             this.userAnswers = new Array(this.quiz.questions.length).fill(null);
-
-
-            this.answerSubmitted = false;
-            this.answerCorrect = false;
-        },
+            this.loading = false;
+        } catch (error) {
+            console.error('Error fetching quiz:', error);
+            this.error = error.message;
+        }
     },
+    submitAnswer() {
+        const userAnswer = this.userAnswers[this.currentIndex];
+        const correctAnswer = this.currentQuestion.correctAnswer;
+
+        if (userAnswer === correctAnswer) {
+            this.answerCorrect = true;
+        } else {
+            this.answerCorrect = false;
+        }
+
+        this.answerSubmitted = true;
+
+        this.saveQuizResult() // Ensure it's being called here
+    },
+    nextQuestion() {
+        if (this.currentIndex < this.quiz.questions.length - 1) {
+            if (this.answerSubmitted) {
+                this.currentIndex++;
+                this.answerSubmitted = false;
+            }
+        } else {
+            console.log('Quiz finished', this.userAnswers);
+            this.saveQuizResult(); // Ensure it's being called here too
+        }
+    },
+    retakeQuiz() {
+        this.currentIndex = 0;
+        this.userAnswers = new Array(this.quiz.questions.length).fill(null);
+        this.answerSubmitted = false;
+        this.answerCorrect = false;
+    },
+    async saveQuizResult() {
+        console.log('quiz finished');
+        await waitForAuthInit();
+        const user = projectAuth.currentUser;
+        if (user) {
+            const userDoc = projectFirestore.collection('Quizzes').doc(this.quizId);
+            try {
+                const userSnapshot = await userDoc.get();
+                if (userSnapshot.exists) {
+                    const userData = userSnapshot.data();
+                    const usersanswers = userData.usersanswers || [];
+                    const newQuizResult = {
+                        quizId: this.quizId,
+                        date: new Date(),
+                        score: this.calculateScore(),
+                        answers: this.userAnswers
+                    };
+                    usersanswers.push(newQuizResult);
+                    await userDoc.update({
+                        usersanswers: usersanswers
+                    });
+                    console.log('Quiz result saved successfully!');
+                } else {
+                    console.error('User document does not exist');
+                }
+            } catch (error) {
+                console.error('Error saving quiz result: ', error);
+            }
+        } else {
+            console.error('User not authenticated');
+        }
+    },
+},
     mounted() {
         this.fetchQuiz();
     },

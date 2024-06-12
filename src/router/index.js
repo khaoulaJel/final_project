@@ -8,6 +8,7 @@ import { isLogged, waitForAuthInit } from '@/firebase/getUser';
 import UserProfile from '@/views/UserProfile.vue';
 import AdminDashboard from '@/views/AdminDashboard.vue';
 import AddQuiz from '@/components/AddQuiz.vue';
+import EditQuiz from '@/components/EditQuiz.vue';
 // Define your routes
 const routes = [
   {
@@ -21,12 +22,12 @@ const routes = [
     component: Auth
   },
   { path: '/quizzes', name: 'Quizzes', component: QuizzesView },
-  // Add the route for the QuizView component
+
   { 
-    path: '/quiz/:id', // Assuming you pass the quiz ID as a parameter
+    path: '/quiz/:id', 
     name: 'Quiz', 
     component: QuizView,
-    meta: { requiresAuth: true } // Add any necessary meta fields
+    meta: { requiresAuth: true } 
   },
   {
     path: '/profile',
@@ -37,14 +38,20 @@ const routes = [
   {
     path: '/admin',
     name: 'AdminDashboard',
-    component: AdminDashboard, // Define the route for AdminDashboard
-    meta: { requiresAuth: true, requiresAdmin: true }, // Optionally add metadata for route guards
+    component: AdminDashboard, 
+    meta: { requiresAuth: true, requiresAdmin: true }, 
   },
   {
-    path: '/add-quiz', // Define the route for adding a quiz
+    path: '/add-quiz', 
     name: 'AddQuiz',
     component: AddQuiz,
     meta: { requiresAuth: true, requiresAdmin: true },
+  },
+  {
+    path: '/edit-quiz/:id',
+    name: 'EditQuiz',
+    component: EditQuiz,
+    props: true,
   },
 ];
 

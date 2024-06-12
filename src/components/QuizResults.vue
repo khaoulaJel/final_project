@@ -17,7 +17,7 @@
   <script>
 
   import { projectFirestore, projectAuth } from '@/firebase/Config';
-
+import {waitForAuthInit} from "@/firebase/getUser.js"
 
 export default {
   props: {
@@ -37,37 +37,7 @@ export default {
     retakeQuiz() {
       this.$emit('retake-quiz');
     },
-    async saveQuizResult() {
-  const user = projectAuth.currentUser;
-  if (user) {
-    const userDoc = projectFirestore.collection('Users').doc(user.uid);
-    try {
-      const userSnapshot = await userDoc.get();
-      if (userSnapshot.exists) {
-        const userData = userSnapshot.data();
-        const quizResults = userData.quizResults || [];
-        const newQuizResult = {
-          quizId: this.quizId,
-          date: new Date(),
-          score: this.calculateScore(),
-          answers: this.userAnswers
-        };
-        quizResults.push(newQuizResult);
-        await userDoc.update({
-          quizResults: quizResults
-        });
-        console.log('Quiz result saved successfully!');
-      } else {
-        console.error('User document does not exist');
-      }
-    } catch (error) {
-      console.error('Error saving quiz result: ', error);
-    }
-  } else {
-    console.error('User not authenticated');
-  }
-}
-
+   
   },
   async mounted() {
     await this.saveQuizResult();

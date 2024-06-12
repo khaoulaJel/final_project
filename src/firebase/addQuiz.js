@@ -2,12 +2,14 @@ import { projectFirestore } from '../Config.js';
 
 const addNewQuizz = async (uid, data) => {
   const quizData = {
-    title: data.title,
-    content: data.content,
-    author: uid,
-    tags: data.tags,
-    answers: [],
-    userScores: [] 
+        quizId: this.$route.params.id,
+            quiz: null,
+            currentIndex: 0,
+            userAnswers: [],
+            loading: true,
+            error: null,
+            answerSubmitted: false,
+            answerCorrect: false,
   };
 
   try {

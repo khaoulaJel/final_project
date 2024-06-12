@@ -11,6 +11,7 @@
           <p>{{ quiz.description }}</p>
           <div>
             <button @click="deleteQuiz(quiz.id)" class="delete-btn">Delete</button>
+            <router-link :to="{ name: 'EditQuiz', params: { id: quiz.id } }" class="edit-btn">Edit</router-link>
           </div>
         </div>
       </div>
@@ -29,19 +30,17 @@ export default {
   },
   data() {
     return {
-      quizzes: [], 
-      isAdmin: false, 
+      quizzes: [],
+      isAdmin: false,
     };
   },
   async created() {
-    await this.fetchQuizzes(); 
+    await this.fetchQuizzes();
   },
   methods: {
     async fetchQuizzes() {
-
       const snapshot = await projectFirestore.collection('Quizzes').get();
       this.quizzes = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
 
       const user = projectAuth.currentUser;
       if (user) {
@@ -53,7 +52,6 @@ export default {
     },
     async deleteQuiz(quizId) {
       try {
-
         await projectFirestore.collection('Quizzes').doc(quizId).delete();
         this.quizzes = this.quizzes.filter(quiz => quiz.id !== quizId);
       } catch (error) {
@@ -83,17 +81,18 @@ h1 {
   margin-bottom: 20px;
 }
 
-.delete-btn {
+.delete-btn, .edit-btn {
   background-color: #5c6bc0;
   color: white;
   border: none;
   border-radius: 5px;
   padding: 8px 16px;
   cursor: pointer;
+  margin-right: 10px;
 }
 
-.delete-btn:hover {
-  background-color: #5c6bc0;
+.delete-btn:hover, .edit-btn:hover {
+  background-color: #3700B3;
 }
 
 .add-quiz-link {

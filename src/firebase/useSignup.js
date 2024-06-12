@@ -13,7 +13,7 @@ const signup = async (email, password, displayName) => {
             displayName: displayName,
             email: email,
             admin: false,
-            quizResults: [] // Initialize an empty object for quiz results (map of quiz IDs to scores)
+            quizResults: [] 
         };
         await projectFirestore.collection('Users').doc(response.user.uid).set(newUserData);
 
