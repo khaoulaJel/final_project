@@ -7,6 +7,11 @@ A web application that allows users to take quizzes and receive instant feedback
 
 ### User Authentication
 - Secure sign up, log in, and log out using Firebase Authentication.
+- 
+## Admin and User Access
+- **Admin Login**: Email - oth@gmail.com / Password - othoth
+- **User Access**: Sign up to the app
+
 
 ### Quiz Creation (Admin Only)
 - Admins can create, edit, and delete quizzes with questions, options, and correct answers.
@@ -39,10 +44,4 @@ A web application that allows users to take quizzes and receive instant feedback
 ### Data Storage
 - Secure storage of quiz questions, user responses, and leaderboard data in Firebase Cloud Firestore.
 
-## Admin and User Access
-- **Admin Login**: Email - oth@gmail.com / Password - othoth
-- **User Access**: Sign up to the app
 
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
