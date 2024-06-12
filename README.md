@@ -1,20 +1,48 @@
-# projet_quiz_solo
+# Quizz Application
 
-## Project setup
-```
-npm install
-```
+## Description
+A web application that allows users to take quizzes and receive instant feedback on their performance.
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+## Features
 
-### Compiles and minifies for production
-```
-npm run build
-```
+### User Authentication
+- Secure sign up, log in, and log out using Firebase Authentication.
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
-"# final_project" 
+### Quiz Creation (Admin Only)
+- Admins can create, edit, and delete quizzes with questions, options, and correct answers.
+- Quizzes can be categorized by topics or difficulty levels.
+
+### Quiz Management
+- **Admin Dashboard**: Access to quiz creation, editing, and deletion.
+- **Quiz Categorization**: Organize quizzes by topics, difficulty, or other criteria.
+
+### Quiz Taking
+- **Quiz Selection**: Browse and choose from available quizzes.
+- **Quiz Interface**: User-friendly, presenting one question at a time.
+- **Question Types**: Multiple-choice, true/false, etc.
+- **Answer Submission**: Submit answers for grading.
+- **Instant Feedback**: Immediate feedback on answer correctness.
+
+### Scoring and Results
+- **Score Calculation**: Based on correct answers.
+- **Results Display**: View scores and detailed results.
+- **Score History**: Track progress over time in user profiles.
+
+### Leaderboard
+- **Global Leaderboard**: View top performers across all quizzes.
+- **Quiz-Specific Leaderboard**: Compare scores with others on the same quiz.
+- **Real-time Updates**: Reflect the latest scores and rankings.
+
+### Responsive Design
+- Optimized for desktops, tablets, and smartphones.
+
+### Data Storage
+- Secure storage of quiz questions, user responses, and leaderboard data in Firebase Cloud Firestore.
+
+## Admin and User Access
+- **Admin Login**: Email - oth@gmail.com / Password - othoth
+- **User Access**: Sign up to the app
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
