@@ -78,7 +78,6 @@
 </template>
 
 <script>
-import { ref } from 'vue';
 import { getQuiz } from '@/firebase/getQuiz.js';
 import AppLayout from '@/components/AppLayout.vue';
 import QuizResults from '@/components/QuizResults.vue';

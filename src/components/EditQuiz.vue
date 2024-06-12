@@ -32,6 +32,7 @@
               <option value="multiple">Multiple Choice</option>
               <option value="truefalse">True/False</option>
             </select>
+
             <template v-if="question.type === 'multiple'">
               <label>Possible Answers:</label>
               <div v-for="(option, optionIndex) in question.options" :key="optionIndex">
@@ -59,9 +60,8 @@
       </div>
     </AppLayout>
   </template>
-  
   <script>
-  import { ref } from 'vue';
+  import { ref, onMounted } from 'vue';
   import { projectFirestore } from '@/firebase/Config';
   import AppLayout from '@/components/AppLayout.vue';
   
@@ -76,6 +76,7 @@
       },
     },
     setup(props) {
+
       const title = ref('');
       const category = ref('');
       const description = ref('');
@@ -84,28 +85,36 @@
       const error = ref(null);
       const success = ref(null);
   
-      const fetchQuiz = async () => {
-        const doc = await projectFirestore.collection('Quizzes').doc(props.quizId).get();
-        if (doc.exists) {
-          const data = doc.data();
-          title.value = data.title;
-          category.value = data.category;
-          description.value = data.description;
-          difficulty.value = data.difficulty;
-          questions.value = data.questions;
-        } else {
-          error.value = 'Quiz not found';
+
+      onMounted(async () => {
+        try {
+          const doc = await projectFirestore.collection('Quizzes').doc(props.quizId).get();
+          if (doc.exists) {
+            const data = doc.data();
+            title.value = data.title;
+            category.value = data.category;
+            description.value = data.description;
+            difficulty.value = data.difficulty;
+            questions.value = data.questions;
+          } else {
+            error.value = 'Quiz not found';
+          }
+        } catch (err) {
+          error.value = '*';
         }
-      };
+      });
   
+
       const addQuestion = () => {
         questions.value.push({ text: '', type: 'multiple', options: ['', ''], answer: '' });
       };
   
+
       const removeQuestion = (index) => {
         questions.value.splice(index, 1);
       };
   
+
       const editQuiz = async () => {
         error.value = null;
         success.value = null;
@@ -123,8 +132,7 @@
         }
       };
   
-      fetchQuiz();
-  
+
       return {
         title,
         category,
@@ -140,6 +148,9 @@
     },
   };
   </script>
+  
+
+  
   
   <style scoped>
   .edit-quiz {

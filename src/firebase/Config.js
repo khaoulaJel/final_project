@@ -17,9 +17,17 @@ firebase.initializeApp(firebaseConfig);
 
 const projectAuth = firebase.auth();
 const projectFirestore = firebase.firestore();
+const waitForAuthInit = () => {
+  return new Promise((resolve, reject) => {
+    const unsubscribe = projectAuth.onAuthStateChanged(user => {
+      unsubscribe();
+      resolve(user);
+    }, reject);
+  });
+};
 
 const googleProvider = new firebase.auth.GoogleAuthProvider();
 const githubProvider = new firebase.auth.GithubAuthProvider();
 const facebookProvider = new firebase.auth.FacebookAuthProvider();
 
-export { projectAuth, projectFirestore, googleProvider, githubProvider, facebookProvider };
+export { projectAuth, projectFirestore, googleProvider, githubProvider, facebookProvider,waitForAuthInit };

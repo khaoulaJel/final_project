@@ -34,6 +34,41 @@ export default {
     },
   },
   methods: {
+    methods: {
+  async saveQuizResult() {
+    await waitForAuthInit();
+    const user = projectAuth.currentUser;
+    if (user) {
+      const userDoc = projectFirestore.collection('Quizzes').doc(this.quizId);
+      try {
+        const userSnapshot = await userDoc.get();
+        if (userSnapshot.exists) {
+          const userData = userSnapshot.data();
+          const usersanswers = userData.usersanswers || [];
+          const newQuizResult = {
+            userId: user.email, // Assuming email is used as the identifier
+            quizId: this.quizId,
+            date: new Date(),
+            score: this.calculateScore(),
+            answers: this.userAnswers
+          };
+          usersanswers.push(newQuizResult);
+          await userDoc.update({
+            usersanswers: usersanswers
+          });
+          console.log('Quiz result saved successfully!');
+        } else {
+          console.error('User document does not exist');
+        }
+      } catch (error) {
+        console.error('Error saving quiz result: ', error);
+      }
+    } else {
+      console.error('User not authenticated');
+    }
+  },
+}
+,
     retakeQuiz() {
       this.$emit('retake-quiz');
     },

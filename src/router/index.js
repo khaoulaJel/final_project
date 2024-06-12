@@ -9,7 +9,8 @@ import UserProfile from '@/views/UserProfile.vue';
 import AdminDashboard from '@/views/AdminDashboard.vue';
 import AddQuiz from '@/components/AddQuiz.vue';
 import EditQuiz from '@/components/EditQuiz.vue';
-// Define your routes
+import Leaderboard from '@/views/LeaderBoard.vue'; // Import the Leaderboard component
+
 const routes = [
   {
     path: '/',
@@ -52,6 +53,12 @@ const routes = [
     name: 'EditQuiz',
     component: EditQuiz,
     props: true,
+  },
+  {
+    path: '/leaderboard', // Route for the leaderboard view
+    name: 'Leaderboard',
+    component: Leaderboard,
+    meta: { requiresAuth: true }, // Requires authentication to access the leaderboard
   },
 ];
 

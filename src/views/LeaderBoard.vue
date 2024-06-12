@@ -1,70 +1,118 @@
 <template>
-    <div>
+  <AppLayout>
+    <div class="leaderboard">
       <h1>Leaderboard</h1>
-      <ul v-if="!loading && leaderboard">
-        <li v-for="(entry, index) in leaderboard" :key="entry.userId">
-          {{ entry.displayName }}: {{ entry.totalScore }}
-        </li>
-      </ul>
-      <p v-if="loading">Loading...</p>
-      <p v-if="error">{{ error }}</p>
+      <div v-if="loading" class="loading">Loading leaderboard...</div>
+      <div v-else-if="error" class="error">{{ error }}</div>
+      <div v-else>
+        <table class="leaderboard-table">
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>User</th>
+              <th>Score</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(entry, index) in sortedLeaderboard" :key="index">
+              <td>{{ index + 1 }}</td>
+              <td>{{ entry.user }}</td>
+              <td>{{ entry.score }}%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
-  </template>
-  
-  <script>
-  import { ref, computed, onMounted } from 'vue';
-  import { getUserById } from './userData'; 
-  
-  export default {
-    name: 'QuizLeaderboard',
-    data(){
-        return {
-            Quizzes= []
-        }
-    }
-    setup() {
-        
+  </AppLayout>
+</template>
 
-      const loading = ref(true);
-      const error = ref(null);
-      const leaderboard = computed(() => {
-        const scores = {};
-  
-        this.quizzes.forEach(quiz => {
-          quiz.useranswers.forEach(answer => {
-            if (!scores[answer.userId]) {
-              scores[answer.userId] = {
-                userId: answer.userId,
-                totalScore: 0,
-                displayName: '', // Default empty, will fetch later
-              };
-            }
-            scores[answer.userId].totalScore += answer.score;
-          });
-        });
-  
-        const sortedScores = Object.values(scores).sort((a, b) => b.totalScore - a.totalScore);
-        return sortedScores;
-      });
-  
-      // Fetch display names
-      const fetchDisplayNames = async () => {
-        try {
-          for (const user of Object.values(scores)) {
-            const userDetails = await getUserById(user.userId);
-            user.displayName = userDetails.displayName; // Assuming getUserById returns an object with displayName
+<script>
+import { projectFirestore } from '@/firebase/Config.js';
+import AppLayout from '@/components/AppLayout.vue';
+
+export default {
+  name: 'Leaderboard',
+  data() {
+    return {
+      leaderboard: [],
+      loading: true,
+      error: null,
+    };
+  },
+  computed: {
+    sortedLeaderboard() {
+      return this.leaderboard.sort((a, b) => b.score - a.score);
+    },
+  },
+  created() {
+    this.fetchLeaderboard();
+  },
+  methods: {
+    async fetchLeaderboard() {
+      try {
+        const snapshot = await projectFirestore.collection('Quizzes').get();
+        let leaderboardData = [];
+        snapshot.docs.forEach(doc => {
+          const data = doc.data();
+          if (data.usersanswers) {
+            data.usersanswers.forEach(answer => {
+              leaderboardData.push({
+                user: data.userId,
+                score: answer.score,
+              });
+            });
           }
-        } catch (e) {
-          error.value = 'Failed to fetch user details';
-        }
-        loading.value = false;
-      };
-  
-      onMounted(async () => {
-        await fetchDisplayNames();
-      });
-  
-      return { loading, error, leaderboard };
-    }
-  };
-  </script>
+        });
+        this.leaderboard = leaderboardData;
+      } catch (error) {
+        this.error = 'Failed to load leaderboard';
+        console.error('Error fetching leaderboard:', error);
+      } finally {
+        this.loading = false;
+      }
+    },
+  },
+};
+</script>
+
+<style scoped>
+.leaderboard {
+  padding: 2rem;
+  background-image: url('@/assets/bgMain.png');
+}
+
+.leaderboard h1 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: #6A0DAD; 
+}
+
+.loading, .error {
+  font-size: 1.5rem;
+  color: #555;
+}
+
+.leaderboard-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.leaderboard-table th, .leaderboard-table td {
+  padding: 0.5rem;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.leaderboard-table th {
+  background-color: #6A0DAD; 
+  color: #fff; 
+}
+
+.leaderboard-table td {
+  background-color: #D1C4E9; 
+}
+
+.leaderboard-table tbody tr:nth-child(even) td {
+  background-color: #BBDEFB; 
+}
+</style>
